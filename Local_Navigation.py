@@ -1,7 +1,17 @@
-def button_center():
-    global state
-    if button_center == 1:
-        state = 1 if state==0 else 0
+Up_threshold = 3500
+Low_threshold = 2300
+
+def state_switch(state, dist):
+    if state == 1: # We're in Global Navigation
+        if (dist[0] > Up_threshold) or (dist[1] > Up_threshold) or (dist[2] > Up_threshold) or (dist[3] > Up_threshold) or (dist[4] > Up_threshold):
+            state = 2 # Switch to Local Navigation to avoid obtstacle. If obstacle is detected at any of the prox sensors.
+            
+    elif state == 2: # We're in Local Navigation
+        if (dist[0] < Low_threshold) and (dist[1] < Low_threshold) and (dist[2] < Low_threshold) and (dist[3] < Low_threshold) and (dist[4] < Low_threshold):
+            state = 1 # Go back to Global Navigation. If obstacle is far wrt to all prox sensors.
+            
+    return state        
+            
 
 def obs_avoid(prox_horizontal, y):
     
@@ -10,15 +20,15 @@ def obs_avoid(prox_horizontal, y):
     w_r = [-40, -20, -20,  20,  40, -10, 30, 0, 8]
 
     # Scale factors for sensors and constant factor
-    sensor_scale = 200
+    sensor_scale = 500
     constant_scale = 20
     
     x = [0,0,0,0,0,0,0,0,0]
     
     if state != 0:
         # Memory
-        x[7] = y[0]//10
-        x[8] = y[1]//10
+        x[7] = y[0]//constant_scale
+        x[8] = y[1]//constant_scale
         
         for i in range(7):
             # Get and scale inputs
@@ -34,6 +44,4 @@ def obs_avoid(prox_horizontal, y):
         # In case we would like to stop the robot
         y = [0,0] 
     
-    # Set motor powers
-    motor_left_target = y[0]
-    motor_right_target = y[1]
+    return y
