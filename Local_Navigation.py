@@ -1,3 +1,5 @@
+from tdmclient import ClientAsync
+
 Up_threshold = 3500
 Low_threshold = 2300
 
@@ -25,23 +27,19 @@ def obs_avoid(prox_horizontal, y):
     
     x = [0,0,0,0,0,0,0,0,0]
     
-    if state != 0:
-        # Memory
-        x[7] = y[0]//constant_scale
-        x[8] = y[1]//constant_scale
+    # Memory
+    x[7] = y[0]//constant_scale
+    x[8] = y[1]//constant_scale
         
-        for i in range(7):
-            # Get and scale inputs
-            x[i] = prox_horizontal[i] // sensor_scale
+    for i in range(7):
+        # Get and scale inputs
+        x[i] = prox_horizontal[i] // sensor_scale
         
-        y = [0,0]    
+    y = [0,0]    
         
-        for i in range(len(x)):    
-            # Compute outputs of neurons and set motor powers
-            y[0] = y[0] + x[i] * w_l[i]
-            y[1] = y[1] + x[i] * w_r[i]
-    else: 
-        # In case we would like to stop the robot
-        y = [0,0] 
+    for i in range(len(x)):    
+        # Compute outputs of neurons and set motor powers
+        y[0] = y[0] + x[i] * w_l[i]
+        y[1] = y[1] + x[i] * w_r[i]
     
     return y
